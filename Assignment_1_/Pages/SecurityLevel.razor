@@ -1,0 +1,67 @@
+@page "/Security"
+@using Assignment_1_.Models
+@using DefaultNamespace
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject FileContextService FileContext
+
+<h3>SecurityLevel</h3>
+
+<AuthorizeView>
+    <h3>Hello @context.User.Identity.Name</h3>
+
+    <h5>Your security level is @context.User.FindFirst(claim => claim.Type.Equals("Level")).Value</h5>
+</AuthorizeView>
+
+<AuthozizeView Policy="SecurityLevel2">
+    <p style="display: none">This piece is visible for level 2 and above</p>
+</AuthozizeView>
+
+<AuthozizeView Policy="SecurityLevel4">
+    <p style="display: none">This piece is visible for level 4 boss</p>
+</AuthozizeView>
+
+
+@if (adults == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+} else if (!adults.Any())
+{
+    <p>
+        <em>No adults...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in adults)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+            </tr>
+        }
+        
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private IList<Adult> adults;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        adults = FileContext.GetAdults();
+    }
+}

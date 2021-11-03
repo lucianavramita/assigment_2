@@ -1,0 +1,50 @@
+@page "/Edit/{Id:int}"
+@using Assignment_1_.Models
+@using Assigment_1_.Services
+@inject NavigationManager NavMgr
+@inject IPeopleService PeopleService
+
+<h3>Edit adult with id: @Id</h3>
+
+@if (AdultToEdit == null)
+{
+    <em>Adult not found...</em>
+}
+else
+{
+    <EditForm Model="@AdultToEdit" OnValidSubmit="@Save">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <h5>Enter job Title:</h5>
+    <div class="form-group">
+        <InputTextArea rows="1"  @bind-Value="AdultToEdit.JobTitle.JobTitle"/>
+    </div>
+    <h5>Enter Salary:</h5>
+        <div class="form-group">
+            <InputNumber rows="1"  @bind-Value="AdultToEdit.JobTitle.Salary"/>
+        </div>
+    <p class="actions">
+        <button class="btn btn-outline-dark" type="submit">Save</button>
+    </p>
+    
+    </EditForm>
+    }
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Adult AdultToEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //AdultToEdit = FileContext.Get(Id);
+        AdultToEdit = await PeopleService.GetAdult(Id);
+    }
+
+    private async void Save()
+    {
+        await PeopleService.ModifyAdult(AdultToEdit);
+        NavMgr.NavigateTo("/ViewAdultsList");
+    }
+}

@@ -1,0 +1,180 @@
+@page "/ViewAdultsList"
+@using Assignment_1_.Models
+@using Assigment_1_.Services
+@inject NavigationManager NavMgr
+@inject IPeopleService PeopleService
+
+
+<h3>Adults List</h3>
+
+
+<p>
+    Search by first name <input type="text" @oninput="@((arg) => Filter(arg))" style="width: 50px">
+</p>
+@if (adultsToShow == null)
+{
+    <p>
+        <em>..</em>
+    </p>
+} else if (!adultsToShow.Any())
+{
+    <p>
+        <em>No adults...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Salary</th>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Hair Color</th>
+            <th>Eye Color</th>
+            <th>Age</th>
+            <th>Weight</th>
+            <th>Height</th>
+            <th>Sex</th>
+            <th>Remove</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in adultsToShow)
+        {
+            <tr>
+                <td>@item.JobTitle.JobTitle</td>
+                <td>@item.JobTitle.Salary</td>
+                <td>@item.Id</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.HairColor</td>
+                <td>@item.EyeColor</td>
+                <td>@item.Age</td>
+                <td>@item.Weight</td>
+                <td>@item.Height</td>
+                <td>@item.Sex</td>
+                <td>
+                    <button @onclick="@(() => RemoveAdult(item.Id))">
+                        <i class="oi oi-trash" style="color: red"/>
+                    </button>
+                </td>
+            </tr>
+        }
+        
+        </tbody>
+    </table>
+}
+
+@if (adults == null)
+{
+    <p>
+        <em>..</em>
+    </p>
+} else if (!adults.Any())
+{
+    <p>
+        <em>No adults...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Salary</th>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Hair Color</th>
+            <th>Eye Color</th>
+            <th>Age</th>
+            <th>Weight</th>
+            <th>Height</th>
+            <th>Sex</th>
+            <th>Remove</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in adults)
+        {
+            <tr>
+                <td>@item.JobTitle.JobTitle</td>
+                <td>@item.JobTitle.Salary</td>
+                <td>@item.Id</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.HairColor</td>
+                <td>@item.EyeColor</td>
+                <td>@item.Age</td>
+                <td>@item.Weight</td>
+                <td>@item.Height</td>
+                <td>@item.Sex</td>
+                <td>
+                    <button @onclick="@(() => RemoveAdult(item.Id))">
+                        <i class="oi oi-trash" style="color: red"/>
+                    </button>
+                </td>
+                <td>
+                    <button @onclick="@(() => Edit(item.Id))">
+                        <i class="oi oi-pencil"/>
+                    </button>
+                </td>
+            </tr>
+        }
+        
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private IList<Adult> adults;
+    private IList<Adult> adultsToShow;
+
+    protected override async Task OnInitializedAsync()
+    {
+        adults = await PeopleService.GetPeoples();
+    }
+
+    private void RemoveAdult(int id)
+    {
+        Adult ToRemove = adults.First(a => a.Id == id);
+        adults.Remove(ToRemove);
+        if (adultsToShow != null) adultsToShow.Remove(ToRemove);
+       // FileContext.RemoveAdult(Id);
+        PeopleService.DeleteAdult(id);
+    }
+
+    public void Filter(ChangeEventArgs changeEventArgs)
+    {
+        string? FilterByFirstName = null;
+        try
+        {
+            FilterByFirstName = changeEventArgs.Value.ToString();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        if ((FilterByFirstName != null)&&(FilterByFirstName != ""))
+        {
+            adultsToShow = adults.Where(a => a.FirstName.Contains(FilterByFirstName)).ToList();
+        }
+        else
+        {
+            adultsToShow = null;
+        }
+    }
+    
+    private void Edit(int id) 
+    {
+        NavMgr.NavigateTo($"Edit/{id}");
+    }
+
+}

@@ -1,0 +1,72 @@
+@page "/AddAdult"
+@using Assignment_1_.Models
+@using Assigment_1_.Services
+@inject IPeopleService PeopleService
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Policy = "SecurityLevel2")]
+
+<h3>Add Adult</h3>
+<p>This page can only be viewed if you have at least level 2 acces</p>
+
+        <EditForm Model="@newAdult" OnValidSubmit="@AddNewAdult">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+            <div class="form-group"> First Name:
+                <InputTextArea rows="1" @bind-Value="newAdult.FirstName"/>
+            </div>
+            <div class="form-group"> Last Name:
+                <InputTextArea rows="1" @bind-Value="newAdult.LastName"/>
+            </div>
+            <div class="form-group"> Hair Color:
+                <InputTextArea rows="1" @bind-Value="newAdult.HairColor"/>
+            </div>
+            <div class="form-group"> Eye Color:
+                <InputTextArea rows="1" @bind-Value="newAdult.EyeColor"></InputTextArea>
+            </div>
+            <div class="form-group"> Sex:
+                <InputTextArea rows="1" @bind-Value="newAdult.Sex"/>
+            </div>
+            <div class="form-group"> Age:
+                <InputNumber @bind-Value="newAdult.Age"/>
+            </div>
+            <div class="form-group"> Weight:
+                <InputNumber @bind-Value="newAdult.Weight"/>
+            </div>
+            <div class="form-group"> Height:
+                <InputNumber @bind-Value="newAdult.Height"/>
+            </div>
+            <div class="form-group"> Job Title:
+                <InputTextArea rows="1"  @bind-Value="newAdult.JobTitle.JobTitle"/>
+            </div>
+            <div class="form-group"> Salary:
+                <InputNumber @bind-Value="newAdult.JobTitle.Salary"/>
+            </div>
+            
+            
+            <p class="actions">
+                <button class="btn btn-outline-dark" type="submit">Create</button>
+            </p>
+        </EditForm>
+        
+
+
+@code {
+    private Adult newAdult = new Adult();
+    private Job newJob = new Job();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        newAdult.JobTitle = newJob;
+    }
+
+    private async void AddNewAdult()
+    {
+        Console.WriteLine("Trying...");
+        if (newAdult != null)
+        {
+            await  PeopleService.AddAdult(newAdult);
+        }
+        NavigationManager.NavigateTo("/viewadultslist");
+        Console.WriteLine("Done");
+    }
+}
